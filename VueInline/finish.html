@@ -1,0 +1,225 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Vue.js Demo</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4"
+        crossorigin="anonymous">
+    <style>
+        body {
+            background-color: #5d0000;
+        }
+        h1 {
+            text-align: center;
+            padding: 20px 0;
+        }
+        .container {
+            background-color: white;
+            min-height:100vh;
+        }
+        img {
+            max-height: 60px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Shopping Cart Vue.js Demo</h1>
+        <div id="app">
+            <table class="table thead-light table-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Is Healthy</th>
+                        <th>Subtotal</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="item in cart">
+                        <template v-if="!item.edit">
+                            <td>{{ item.name }}</td>
+                            <td>{{ item.price | currency }}</td>
+                            <td>
+                                {{ item.quantity }}
+                            </td>
+                            <td>
+                                <input type="checkbox" class="form-control" name="price" id="" v-model="item.isHealthy" disabled>
+                            </td>
+                            <td>{{ (item.quantity * item.price) | currency }}</td>
+                            <td>
+                                <button class="btn btn-info" @click="item.edit = !item.edit">Edit</button>
+                            </td>
+                            <td>
+                                <img v-if="item.isHealthy" src="https://media.giphy.com/media/2xO491sY6f0cM/giphy.gif" alt="huzzah">
+                                <img v-else src="https://media.giphy.com/media/JUEKek7t2bqYE/giphy.gif" alt="boo">
+                            </td>
+                        </template>
+                        <template v-else>
+                            <td>
+                                <input type="text" class="form-control" name="name" id="" v-model="item.name" />
+                            </td>
+                            <td>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">$</span>
+                                    </div>
+                                    <input class="form-control" type="text" name="price" id="" v-model="item.price">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="input-group mb-3">
+                                    <input class="form-control" type="text" name="quantity" id="" v-model="item.quantity">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-secondary" @click="item.quantity++">+</button>
+                                        <button class="btn btn-secondary" @click="item.quantity--">-</button>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <input type="checkbox" class="form-control" name="price" id="" v-model="item.isHealthy">
+                            </td>
+                            <td>
+                                {{ (item.quantity * item.price) | currency }}
+                            </td>
+                            <td>
+                                <button class="btn btn-info" @click="item.edit = !item.edit">Save</button>
+                            </td>
+                        </template>
+                    </tr>
+                    <tr>
+                        <td><strong>Total</strong></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td><strong>{{ getTotal() | currency }}</strong></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td>
+                            <input type="text" class="form-control" name="name" id="" v-model="newItem.name" />
+                        </td>
+                        <td>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">$</span>
+                                </div>
+                                <input class="form-control" type="text" name="price" id="" v-model="newItem.price">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="input-group mb-3">
+                                <input class="form-control" type="text" name="quantity" id="" v-model="newItem.quantity">
+                                <div class="input-group-append">
+                                    <button class="btn btn-secondary" @click="newItem.quantity++">+</button>
+                                    <button class="btn btn-secondary" @click="newItem.quantity--">-</button>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <input type="checkbox" class="form-control" name="price" id="" v-model="newItem.isHealthy">
+                        </td>
+                        <td></td>
+                        <td>
+                            <input type="submit" class="btn btn-info" @click="addItemToCart" value="Add To Cart">
+                        </td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                newItem: {
+                    name: '',
+                    quantity: 0,
+                    price: 0,
+                    isHealthy: false,
+                    edit: false
+                },
+                cart: [{
+                        name: 'Yogurt',
+                        quantity: 1,
+                        price: 1.00,
+                        isHealthy: true,
+                        edit: false
+                    },
+                    {
+                        name: 'Tomatoes',
+                        quantity: 2,
+                        price: 0.50,
+                        isHealthy: true,
+                        edit: false
+                    },
+                    {
+                        name: 'Chips',
+                        quantity: 5,
+                        price: 3.00,
+                        isHealthy: false,
+                        edit: false
+                    },
+                    {
+                        name: 'Beans',
+                        quantity: 4,
+                        price: 1.00,
+                        isHealthy: true,
+                        edit: false
+                    },
+                    {
+                        name: 'Candy',
+                        quantity: 2,
+                        price: 0.75,
+                        isHealthy: false,
+                        edit: false
+                    }
+                ]
+            },
+            filters: {
+                currency: function (value) {
+                    return '$' + parseFloat(value).toFixed(2);
+                }
+            },
+            methods: {
+                addItemToCart: function () {
+                    this.cart.push(this.newItem);
+                    this.resetNewItem();
+                },
+                resetNewItem: function () {
+                    this.newItem = {
+                        name: '',
+                        quantity: 0,
+                        price: 0,
+                        isHealthy: false
+                    };
+                },
+                getTotal: function () {
+                    return this.cart
+                        .map(function (item) {
+                            return item.price * item.quantity;
+                        })
+                        .reduce(function (total, subtotal) {
+                            return total + subtotal;
+                        });
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
